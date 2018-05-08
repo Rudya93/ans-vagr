@@ -1,0 +1,6 @@
+- name: play
+  apt:
+    name: mysql-server
+    state: latest
+    default_release: squeeze-backports
+    update_cache: yes
