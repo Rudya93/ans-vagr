@@ -1,0 +1,47 @@
+pipeline {
+    agent {
+        # указываем, что выполнять задачу хотим внутри 
+        # Docker-контейнера на базе указанного образа:
+        docker {
+            image 'java:8-jdk'
+        }
+    }
+    
+    stages {
+        stage('Стягиваем код из ГИТа') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Собираем') {
+            steps {
+                sh 'chmod +x ./gradlew'
+                sh './gradlew build -x test'
+            }
+ 
+        }
+        stage('Тестируем') {
+            steps {
+                script {
+                    sh './gradlew test'
+                }
+            }
+        }
+    }
+}
+ 
+#_ Этап сборки нового Docker-образа и его загрузки с систему Artifactory:
+node {
+    stage('Собираем образ') {
+        docker.withRegistry("https://repo.artifactory.bank", "LoginToArtifactory") {
+            def dkrImg = docker.build("repo.artifactory.bank/dev-backend:${env.BUILD_ID}")
+            dkrImg.push()
+            dkrImg.push('latest')
+        }
+	}
+    stage('Заливаем его в Artifactory') {
+        docker.withRegistry("https://repo.artifactory.bank", "LoginToArtifactory") {
+            sh "docker service update --image repo.artifactory.bank/dev-backend:${env.BUILD_ID} SMB_dev-backend"
+        }
+    }
+}
