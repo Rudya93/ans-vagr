@@ -1,0 +1,1 @@
+scp -i "oRudenk.pem" oRudenk.pem ubuntu@ec2-35-162-83-142.us-west-2.compute.amazonaws.com:/home/ubuntu
