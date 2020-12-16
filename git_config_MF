@@ -1,0 +1,1 @@
+GIT_SSH_COMMAND='ssh -i ~/.ssh/bot_priv_key -o IdentitiesOnly=yes -m hmac-sha2-512' git clone ssh://git@main.gitlab.in.here.com:3389/es/hls_mumbai/hls_ec2/tools/farmer.git Farmer
